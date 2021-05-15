@@ -1,37 +1,55 @@
 package com.qtd.bot;
 
-import discord4j.core.DiscordClientBuilder;
-import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
+import java.awt.*;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import org.javacord.api.DiscordApi;
+import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 public class QTDBot {
+    
+    final static String COMMAND_PREFIX = "!";
+
+    // Reseverd for futher use
+    private static final Map<String, Command> commands = new HashMap<>();
 
     public static void main(String[] args) {
-        GatewayDiscordClient client = DiscordClientBuilder.create(args[0])
-                .build()
-                .login()
-                .block();
 
-        client.getEventDispatcher().on(ReadyEvent.class)
-                .subscribe(event -> {
-                    final User self = event.getSelf();
-                    System.out.println(String.format(
-                            "Logged in as %s#%s", self.getUsername(), self.getDiscriminator()
-                    ));
-                });
+        DiscordApi api = new DiscordApiBuilder().setToken(args[0]).login().join();
 
-        client.getEventDispatcher().on(MessageCreateEvent.class)
-                .map(MessageCreateEvent::getMessage)
-                .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
-                .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
-                .flatMap(Message::getChannel)
-                .flatMap(channel -> channel.createMessage("Pong!"))
-                .subscribe();
+        // Add a listener which answers with "Pong!" if someone writes "!ping"
+        api.addMessageCreateListener(event -> {
+            if (event.getMessageContent().equalsIgnoreCase(COMMAND_PREFIX + "ping")) {
+                event.getChannel().sendMessage("Pong!");
+            }
+        });
 
-        client.onDisconnect().block();
+        // Add a listener which answers with the commands if someone writes "!help"
+        api.addMessageCreateListener(event -> {
+            if (event.getMessageContent().equalsIgnoreCase(COMMAND_PREFIX + "help")) {
+
+                // Creates the embed
+                EmbedBuilder embed = new EmbedBuilder()
+                        .setTitle("Bot Commands")
+                        .setDescription("Hier der Überblick über alle Commands:")
+                        .setAuthor("QTD-Bot", "", "")
+                        .addInlineField("!help", "Zeigt diese Hilfe an")
+                        .addInlineField("!ping", "Spielt Pong! zurück :O")
+                        .setColor(Color.BLUE)
+                        .setTimestamp(Instant.now());
+
+                event.getChannel().sendMessage(embed);
+            }
+        });
+
+        // Prints the invite url
+        System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
+
     }
 
 }
