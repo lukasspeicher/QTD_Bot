@@ -1,1 +1,0 @@
-worker: java -jar target/QTD_Bot-1.0-SNAPSHOT-shaded.jar

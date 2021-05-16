@@ -1,7 +1,11 @@
 package com.qtd.bot;
 
+import org.javacord.api.event.message.MessageCreateEvent;
 
-// Reserved for further use
-public interface Command {
+public interface Command{
+
+    String getCommand();
+
+    void sendEventMessage(MessageCreateEvent event, String option);
 
 }
