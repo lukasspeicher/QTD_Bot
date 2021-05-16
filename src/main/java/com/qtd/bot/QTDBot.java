@@ -23,7 +23,7 @@ public class QTDBot {
         for (Command command : commands) {
             api.addMessageCreateListener(event -> {
                 if (event.getMessageContent().contains(COMMAND_PREFIX + command.getCommand())) {
-                    command.sendEventMessage(event, event.getMessageContent().substring(event.getMessageContent().lastIndexOf(' ')+1));
+                    command.sendEventMessage(event, event.getMessageContent().substring(event.getMessageContent().indexOf(' ')+1));
                 }
             });
         }

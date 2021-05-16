@@ -24,14 +24,24 @@ public class CMC implements Command{
     @Override
     public void sendEventMessage(MessageCreateEvent event, String option) {
 
-        //System.out.println(option);
+        String crypto = option;
 
+        String currency = "";
+
+        if(option.contains(" ")){
+            crypto = option.substring(0, option.lastIndexOf(' ')+1);
+
+            currency = option.substring(option.lastIndexOf(' ')+1);
+        }
+
+
+        // System.out.println(crypto + " " + currency);
 
         OkHttpClient client = new OkHttpClient();
 
 
         Request request = new Request.Builder()
-                .url("http://api.coincap.io/v2/assets/" + option.toLowerCase())
+                .url("http://api.coincap.io/v2/assets/" + crypto.toLowerCase())
                 .build();
 
         //System.out.println(request.toString());
@@ -46,7 +56,15 @@ public class CMC implements Command{
 
             double price_value = Double.parseDouble(price.substring(0, price.lastIndexOf('.')+3));
 
-            event.getChannel().sendMessage(price_value + " $");
+            if (currency.equals("€")){
+
+                String roundedOutput = String.format("%.2f", price_value*0.84);
+
+                event.getChannel().sendMessage("~ " + roundedOutput + " €");
+            } else {
+                event.getChannel().sendMessage(price_value + " $");
+            }
+
         } catch (IOException | JSONException e) {
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
             e.printStackTrace();
