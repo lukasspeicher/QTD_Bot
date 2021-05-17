@@ -1,5 +1,5 @@
+com\qtd\bot\Crypto.class
 com\qtd\bot\QTDBot.class
 com\qtd\bot\Help.class
 com\qtd\bot\Ping.class
-com\qtd\bot\CMC.class
 com\qtd\bot\Command.class
