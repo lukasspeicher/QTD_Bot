@@ -20,10 +20,20 @@ public class Crypto implements Command{
 
     final String COMMAND = "crypto";
 
+    final String COMMAND_OPTIONAL = " <name> <option>";
+
+    final String DESCRIPTION = "Gibt den aktuellen Preis der Kryptowährung zurück (in $ und €).\n <name> = Name der Kryptowährung\n<option> = FIAT-Währung (z.B. €)";
+
     @Override
     public String getCommand() {
         return COMMAND;
     }
+
+    @Override
+    public String getCommandOptional() { return COMMAND_OPTIONAL; }
+
+    @Override
+    public String getDescription() { return DESCRIPTION; }
 
     @Override
     public void sendEventMessage(MessageCreateEvent event, String option) {
@@ -59,16 +69,16 @@ public class Crypto implements Command{
             double price_value = Double.parseDouble(price.substring(0, price.lastIndexOf('.')+3));
             DecimalFormat formatter = new DecimalFormat("#,###.00");
 
-            event.getChannel().sendMessage("Current price of " + crypto + ":\n");
+            event.getChannel().sendMessage("Aktueller Preis von " + crypto + ":\n");
 
             if (currency.equals("€")){
-                event.getChannel().sendMessage("~ " + formatter.format(price_value*0.84) + " €");
+                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.USDTOEUR) + " €");
             } else if (currency.equals("$")){
                 event.getChannel().sendMessage(formatter.format(price_value) + " $");
             } else {
                 event.getChannel().sendMessage(formatter.format(price_value) + "$\n");
 
-                event.getChannel().sendMessage("~ " + formatter.format(price_value*0.84) + "€");
+                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.USDTOEUR) + "€");
             }
 
         } catch (IOException | JSONException e) {

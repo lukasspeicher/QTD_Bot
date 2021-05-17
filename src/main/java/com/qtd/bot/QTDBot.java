@@ -15,7 +15,6 @@ public class QTDBot {
 
         DiscordApi api = new DiscordApiBuilder().setToken(args[0]).login().join();
 
-
         commands.add(new Help());
         commands.add(new Ping());
         commands.add(new Crypto());
@@ -27,7 +26,6 @@ public class QTDBot {
                 }
             });
         }
-
 
         // Prints the invite url
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());

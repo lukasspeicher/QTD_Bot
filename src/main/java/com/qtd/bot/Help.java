@@ -1,5 +1,6 @@
 package com.qtd.bot;
 
+import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -10,21 +11,34 @@ public class Help implements Command{
 
     final String COMMAND = "help";
 
+    final String DESCRIPTION = "Zeigt diese Hilfe an";
+
     @Override
     public String getCommand() {
         return COMMAND;
     }
 
     @Override
+    public String getCommandOptional() { return ""; }
+
+    @Override
+    public String getDescription() { return DESCRIPTION; }
+
+    @Override
     public void sendEventMessage(MessageCreateEvent event, String option) {
-        event.getChannel().sendMessage( new EmbedBuilder()
-                .setTitle("Bot Commands")
-                .setDescription("Hier der Überblick über alle Commands:")
-                .setAuthor("QTD-Bot", "", "")
-                .addInlineField("!help", "Zeigt diese Hilfe an")
-                .addInlineField("!ping", "Spielt Pong! zurück :O")
-                .addField("!crypto <name> <option>", "Gibt den aktuellen Preis der Kryptowährung zurück (in $ und €).\n <name> = Name der Kryptowährung\n<option> = FIAT-Währung (z.B. €)")
-                .setColor(Color.BLUE)
-                .setTimestamp(Instant.now()));
+
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle("Bot Commands")
+            .setDescription("Hier der Überblick über alle Commands:")
+            .setAuthor("QTD-Bot", "", "")
+            .setColor(Color.BLUE)
+            .setTimestamp(Instant.now());
+
+        for (Command command: QTDBot.commands) {
+            embed.addField(QTDBot.COMMAND_PREFIX + command.getCommand() + command.getCommandOptional(), command.getDescription());
+        }
+
+        event.getChannel().sendMessage(embed);
+
     }
 }

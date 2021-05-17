@@ -6,6 +6,10 @@ public interface Command{
 
     String getCommand();
 
+    String getCommandOptional();
+
+    String getDescription();
+
     void sendEventMessage(MessageCreateEvent event, String option);
 
 }
