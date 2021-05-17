@@ -19,6 +19,7 @@ public class QTDBot {
         commands.add(new Help());
         commands.add(new Ping());
         commands.add(new Crypto());
+        commands.add(new Music());
 
         for (Command command : commands) {
             api.addMessageCreateListener(event -> {
