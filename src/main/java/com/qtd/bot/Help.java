@@ -23,6 +23,7 @@ public class Help implements Command{
                 .setAuthor("QTD-Bot", "", "")
                 .addInlineField("!help", "Zeigt diese Hilfe an")
                 .addInlineField("!ping", "Spielt Pong! zurück :O")
+                .addField("!crypto <name> <option>", "Gibt den aktuellen Preis der Kryptowährung zurück (in $ und €).\n <name> = Name der Kryptowährung\n<option> = FIAT-Währung (z.B. €)")
                 .setColor(Color.BLUE)
                 .setTimestamp(Instant.now()));
     }
