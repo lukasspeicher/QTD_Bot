@@ -14,6 +14,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Music implements Command {
 
@@ -34,6 +35,15 @@ public class Music implements Command {
 
     @Override
     public void sendEventMessage(MessageCreateEvent event, String option) {
+
+        if(option.equals("stop")){
+            try {
+                event.getServer().get().getAudioConnection().get().close();
+            } catch (NoSuchElementException e){
+                event.getChannel().sendMessage("Mit keinem Voice-Channel verbunden");
+            }
+            return;
+        }
 
         // Get User
         User user = event.getMessage().getAuthor().asUser().get();
@@ -61,12 +71,6 @@ public class Music implements Command {
                     // Create an audio source and add it to the audio connection's queue
                     AudioSource source = new LavaplayerAudioSource(event.getApi(), player);
                     audioConnection.setAudioSource(source);
-
-                    if(option.equals("stop")){
-                       player.destroy();
-                       playerManager.shutdown();
-                       return;
-                    }
 
                     playerManager.loadItem(option, new AudioLoadResultHandler() {
                         @Override
