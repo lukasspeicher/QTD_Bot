@@ -14,6 +14,7 @@ public class QTDBot {
     public static void main(String[] args) {
 
         DiscordApi api = new DiscordApiBuilder().setToken(args[0]).login().join();
+        api.updateActivity("!help | Zeigt alle Commands");
 
         commands.add(new Help());
         commands.add(new Ping());
