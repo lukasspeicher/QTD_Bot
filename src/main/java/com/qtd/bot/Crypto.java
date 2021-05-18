@@ -1,19 +1,15 @@
 package com.qtd.bot;
 
-import io.quickchart.QuickChart;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import org.json.*;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.time.Instant;
 
 
 public class Crypto implements Command{
@@ -37,6 +33,8 @@ public class Crypto implements Command{
 
     @Override
     public void sendEventMessage(MessageCreateEvent event, String option) {
+
+        checkCurrencyExchange();
 
         String crypto = option;
 
@@ -72,13 +70,13 @@ public class Crypto implements Command{
             event.getChannel().sendMessage("Aktueller Preis von " + crypto + ":\n");
 
             if (currency.equals("€")){
-                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.USDTOEUR) + " €");
+                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.usdToEur) + " €");
             } else if (currency.equals("$")){
                 event.getChannel().sendMessage(formatter.format(price_value) + " $");
             } else {
                 event.getChannel().sendMessage(formatter.format(price_value) + "$\n");
 
-                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.USDTOEUR) + "€");
+                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.usdToEur) + "€");
             }
 
         } catch (IOException | JSONException e) {
@@ -112,6 +110,59 @@ public class Crypto implements Command{
                 .setImage(new File(chart.getUrl()))
                 .setTimestamp(Instant.now()));
 */
+    }
+
+    void checkCurrencyExchange(){
+
+        if(Currency.timestampLastRequest == null){
+            CurrencyRequest();
+        } else {
+            java.util.Date date = new java.util.Date();
+            Timestamp timestampNow = new Timestamp(date.getTime());
+
+            long diffMilliseconds = timestampNow.getTime() - Currency.timestampLastRequest.getTime();
+
+            long minutes = diffMilliseconds / (60 * 1000);
+
+            //System.out.println(minutes);
+
+            if(minutes > 60){
+                CurrencyRequest();
+            }
+        }
+
+    }
+
+    final String fixerApi = "5504a61518bd67f319e9a4fa9f3f19fa";
+
+    void CurrencyRequest(){
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url("http://data.fixer.io/api/latest?access_key=" + fixerApi + "&base=EUR" + "&symbols=USD")
+                .build();
+
+        //System.out.println(request.toString());
+
+        try (Response response = client.newCall(request).execute()) {
+
+            JSONObject  json = new JSONObject (response.body().string());
+
+            //System.out.println(json.toString());
+
+            double exchangeRate = Double.parseDouble(json.getJSONObject("rates").get("USD").toString());
+
+            Currency.usdToEur = (1/exchangeRate);
+
+            //System.out.println(Currency.usdToEur);
+
+            Currency.timestampLastRequest = new Timestamp(new java.util.Date().getTime());
+
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
