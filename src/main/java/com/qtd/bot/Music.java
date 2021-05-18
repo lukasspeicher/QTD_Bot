@@ -77,16 +77,16 @@ public class Music implements Command {
                     playerManager.loadItem(option, new AudioLoadResultHandler() {
                         @Override
                         public void trackLoaded(AudioTrack track) {
-                            event.getApi().updateActivity(player.getPlayingTrack().getInfo().title);
                             player.playTrack(track);
+                            event.getApi().updateActivity(player.getPlayingTrack().getInfo().title);
                         }
 
                         @Override
                         public void playlistLoaded(AudioPlaylist playlist) {
                             for (AudioTrack track : playlist.getTracks()) {
+                                player.playTrack(track);
                                 //event.getApi().updateActivity(player.getPlayingTrack().getInfo().title);
                                 // TODO Check Playlist Handling with Activity
-                                player.playTrack(track);
                             }
                         }
 
