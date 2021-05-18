@@ -70,13 +70,13 @@ public class Crypto implements Command{
             event.getChannel().sendMessage("Aktueller Preis von " + crypto + ":\n");
 
             if (currency.equals("€")){
-                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.usdToEur) + " €");
+                event.getChannel().sendMessage(formatter.format(price_value*Currency.usdToEur) + " €");
             } else if (currency.equals("$")){
                 event.getChannel().sendMessage(formatter.format(price_value) + " $");
             } else {
                 event.getChannel().sendMessage(formatter.format(price_value) + "$\n");
 
-                event.getChannel().sendMessage("~ " + formatter.format(price_value*Currency.usdToEur) + "€");
+                event.getChannel().sendMessage(formatter.format(price_value*Currency.usdToEur) + "€");
             }
 
         } catch (IOException | JSONException e) {
