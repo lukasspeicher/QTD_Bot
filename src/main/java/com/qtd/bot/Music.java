@@ -38,12 +38,11 @@ public class Music implements Command {
 
         if(option.equals("stop")){
             try {
-                event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
                 event.getServer().get().getAudioConnection().get().close();
             } catch (NoSuchElementException e){
-                event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
                 event.getChannel().sendMessage("Mit keinem Voice-Channel verbunden");
             }
+            event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
             return;
         }
 
