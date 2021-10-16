@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -22,7 +22,16 @@ public class Music implements Command {
 
     final String COMMAND_OPTIONAL = " <option>";
 
-    final String DESCRIPTION = "Joint in den Voice Channel und kann Musik abspielen.\n<option> = Audio-URL (z.B. YouTube)\nstop = beendet die Wiedergabe";
+    final String DESCRIPTION = "Joint in den Voice Channel und kann Musik abspielen.\n\n<option> = Audio-URL (z.B. YouTube)\nFügt weitere Lieder automatisch zur Queue hinzu\n\nskip = Springt zum nächsten Lied der Queue" +
+            "\nqueue = Zeigt alle Lieder der aktuellen Queue an\n\nstop = Beendet die Wiedergabe";
+
+    ServerVoiceChannel channel;
+
+    AudioPlayerManager playerManager;
+
+    AudioPlayer player;
+
+    TrackScheduler trackScheduler;
 
     @Override
     public String getCommand() { return COMMAND; }
@@ -39,6 +48,7 @@ public class Music implements Command {
         if(option.equals("stop")){
             try {
                 event.getServer().get().getAudioConnection().get().close();
+                channel = null;
             } catch (NoSuchElementException e){
                 event.getChannel().sendMessage("Mit keinem Voice-Channel verbunden");
             }
@@ -59,48 +69,28 @@ public class Music implements Command {
         // If User is connected
         if (userVoiceChannelId != 0) {
 
-            try {
+            if(option.equals("skip")){
+                if(channel != null && trackScheduler != null){
+                    trackScheduler.skip();
+                    return;
+                } else {
+                    event.getChannel().sendMessage("Nichts zu skippen :x: ");
+                    return;
+                }
+            } else if(option.equals("queue")){
+                if(channel != null && trackScheduler != null){
+                    trackScheduler.queueInfo();
+                    return;
+                } else {
+                    event.getChannel().sendMessage("Keine Queue vorhanden :x: ");
+                    return;
+                }
+            }
 
-                ServerVoiceChannel channel = event.getApi().getServerVoiceChannelById(userVoiceChannelId).get();
-                channel.connect().thenAccept(audioConnection -> {
+            if(channel != null){
+                channel.getLatestInstance().thenAccept(audioConnection -> {
 
-                    // Create a player manager
-                    AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
-                    playerManager.registerSourceManager(new YoutubeAudioSourceManager());
-                    AudioPlayer player = playerManager.createPlayer();
-
-                    // Create an audio source and add it to the audio connection's queue
-                    AudioSource source = new LavaplayerAudioSource(event.getApi(), player);
-                    audioConnection.setAudioSource(source);
-
-                    playerManager.loadItem(option, new AudioLoadResultHandler() {
-                        @Override
-                        public void trackLoaded(AudioTrack track) {
-                            player.playTrack(track);
-                            event.getApi().updateActivity(player.getPlayingTrack().getInfo().title);
-                        }
-
-                        @Override
-                        public void playlistLoaded(AudioPlaylist playlist) {
-                            for (AudioTrack track : playlist.getTracks()) {
-                                player.playTrack(track);
-                                //event.getApi().updateActivity(player.getPlayingTrack().getInfo().title);
-                                // TODO Check Playlist Handling with Activity
-                            }
-                        }
-
-                        @Override
-                        public void noMatches() {
-                            // nothing found
-                            event.getChannel().sendMessage("Kein Inhalt gefunden");
-                        }
-
-                        @Override
-                        public void loadFailed(FriendlyException throwable) {
-                            // Loading failed
-                            event.getChannel().sendMessage("Laden fehlgeschlagen");
-                        }
-                    });
+                    play(event, option);
 
                 }).exceptionally(e -> {
                     // Failed to connect to voice channel (no permissions?)
@@ -108,14 +98,69 @@ public class Music implements Command {
                     event.getChannel().sendMessage("Verbindung zum Channel fehlgeschlagen");
                     return null;
                 });
+            } else {
+                try {
 
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                event.getChannel().sendMessage("Verbindungsaufbau fehlgeschlagen");
+                    channel = event.getApi().getServerVoiceChannelById(userVoiceChannelId).get();
+                    channel.connect().thenAccept(audioConnection -> {
+
+                        // Create a player manager
+                        playerManager = new DefaultAudioPlayerManager();
+                        AudioSourceManagers.registerRemoteSources(playerManager);
+                        player = playerManager.createPlayer();
+
+                        trackScheduler = new TrackScheduler(player);
+                        player.addListener(trackScheduler);
+
+                        // Create an audio source and add it to the audio connection's queue
+                        AudioSource source = new LavaplayerAudioSource(event.getApi(), player);
+                        audioConnection.setAudioSource(source);
+
+                        play(event, option);
+
+                    }).exceptionally(e -> {
+                        // Failed to connect to voice channel (no permissions?)
+                        e.printStackTrace();
+                        event.getChannel().sendMessage("Verbindung zum Channel fehlgeschlagen");
+                        return null;
+                    });
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    event.getChannel().sendMessage("Verbindungsaufbau fehlgeschlagen");
+                }
             }
 
         } else {
             event.getChannel().sendMessage("Du musst im Voice-Channel sein, um music-Befehle zu geben");
         }
+    }
+
+    private void play(MessageCreateEvent event, String option) {
+        playerManager.loadItem(option, new AudioLoadResultHandler() {
+            @Override
+            public void trackLoaded(AudioTrack track) {
+                trackScheduler.queue(event, track);
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                for (AudioTrack track : playlist.getTracks()) {
+                    trackScheduler.queue(event, track);
+                }
+            }
+
+            @Override
+            public void noMatches() {
+                // nothing found
+                event.getChannel().sendMessage("Kein Inhalt gefunden");
+            }
+
+            @Override
+            public void loadFailed(FriendlyException throwable) {
+                // Loading failed
+                event.getChannel().sendMessage("Laden fehlgeschlagen");
+            }
+        });
     }
 }

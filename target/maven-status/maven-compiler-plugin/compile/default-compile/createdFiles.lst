@@ -1,4 +1,5 @@
 com\qtd\bot\Music$1.class
+com\qtd\bot\TrackScheduler.class
 com\qtd\bot\Currency.class
 com\qtd\bot\Ping.class
 com\qtd\bot\Command.class
