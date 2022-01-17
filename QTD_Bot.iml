@@ -19,15 +19,15 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.bouncycastle:bcprov-jdk15on:1.59" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: io.vavr:vavr:0.10.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: io.vavr:vavr-match:0.10.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-core:2.14.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.14.1" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:4.9.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-core:2.17.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.17.1" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:4.9.3" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:2.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.4.10" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.json:json:20210307" level="project" />
-    <orderEntry type="library" name="Maven: io.quickchart:QuickChart:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20211205" level="project" />
+    <orderEntry type="library" name="Maven: io.quickchart:QuickChart:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
