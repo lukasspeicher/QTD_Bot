@@ -19,6 +19,7 @@ import java.util.Date;
 
 
 public class Crypto implements Command{
+    //Hallo erstmal
 
     final String COMMAND = "crypto";
 
