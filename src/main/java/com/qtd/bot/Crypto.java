@@ -20,7 +20,7 @@ public class Crypto implements Command{
 
     final String COMMAND_OPTIONAL = " <name> <option>";
 
-    final String DESCRIPTION = "Gibt den aktuellen Preis der Kryptowährung zurück (in $ und €).\n <name> = Name der Kryptowährung\n<option> = FIAT-Währung (z.B. €)\noder graph = Stellt die Preisentwicklung als Graph dar";
+    final String DESCRIPTION = "Gibt den aktuellen Preis der Kryptowährung zurück (in $ und €).\n <name> = Name der Kryptowährung\n<option> = FIAT-Währung (z.B. €)\noder graph = Stellt die Preisentwicklung als Graph dar. Interval möglich (z.B. 2d).";
 
     @Override
     public String getCommand() {
@@ -43,19 +43,26 @@ public class Crypto implements Command{
         String currency = "";
 
         if(option.contains(" ")){
-            crypto = option.substring(0, option.lastIndexOf(' '));
+            crypto = option.substring(0, option.indexOf(' '));
 
-            currency = option.substring(option.lastIndexOf(' ')+1);
-        }
+            currency = option.substring(option.indexOf(' ')+1, option.indexOf(' ')+2);
 
-        if(currency.contains("graph")){
-            printGraph(event, crypto);
+            if(option.contains("graph")) {
+                String possibleTimeInterval = option.substring(option.indexOf("graph"));
+
+                if(possibleTimeInterval.contains("d")){
+                    printGraph(event, crypto, option.substring(option.lastIndexOf(' ')+1));
+                } else {
+                    printGraph(event, crypto, null);
+                }
+            }
+
         }
 
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("http://api.coincap.io/v2/assets/" + crypto.toLowerCase())
+                .url("https://api.coincap.io/v2/assets/" + crypto.toLowerCase())
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
@@ -89,16 +96,26 @@ public class Crypto implements Command{
 
     }
 
-    void printGraph(MessageCreateEvent event, String crypto){
+    void printGraph(MessageCreateEvent event, String crypto, String givenInterval){
 
-        Timestamp currentTime = new Timestamp(new Date().getTime());
+        Timestamp currentTime;
+        Timestamp startTime;
 
-        Timestamp startTime = new Timestamp(currentTime.getTime() - (1000 * 60 * 60 * 24));
+        if (givenInterval != null && !givenInterval.equalsIgnoreCase("") && !givenInterval.equalsIgnoreCase(" ")) {
+
+            int timeInterval = Integer.parseInt(givenInterval.substring(0, givenInterval.indexOf('d')));
+
+            currentTime = new Timestamp(new Date().getTime());
+            startTime = new Timestamp(currentTime.getTime() - ((1000 * 60 * 60 * 24)*timeInterval));
+        } else {
+            currentTime = new Timestamp(new Date().getTime());
+            startTime = new Timestamp(currentTime.getTime() - (1000 * 60 * 60 * 24));
+        }
 
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("http://api.coincap.io/v2/assets/" + crypto.toLowerCase() + "/history?interval=h1&start=" + startTime.getTime() + "&end=" + currentTime.getTime())
+                .url("https://api.coincap.io/v2/assets/" + crypto.toLowerCase() + "/history?interval=h1&start=" + startTime.getTime() + "&end=" + currentTime.getTime())
                 .build();
 
         ArrayList<SpecificValue> data = new ArrayList<>();
@@ -118,7 +135,7 @@ public class Crypto implements Command{
             e.printStackTrace();
         }
 
-        event.getChannel().sendMessage("Preisentwicklung von " + crypto + " in den letzten 24h (in $):");
+        event.getChannel().sendMessage("Preisentwicklung von " + crypto + " (in $):");
         event.getChannel().sendMessage(GraphGenerator.generateGraph(data, crypto));
     }
 

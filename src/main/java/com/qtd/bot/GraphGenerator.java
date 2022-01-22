@@ -35,7 +35,7 @@ public class GraphGenerator {
 
         result.append("],"
                 + "        datasets: [{"
-                + "            label: '").append(item.toUpperCase()).append(" (24h)',")
+                + "            label: '").append(item.toUpperCase()).append("',")
                 .append("            data: [");
 
         for (SpecificValue value: data) {
@@ -54,7 +54,7 @@ public class GraphGenerator {
         chart.setBackgroundColor("#ffffff");
         chart.setConfig(result.toString());
 
-        return chart.getUrl();
+        return chart.getShortUrl();
     }
 
     // Alte Lösung für Anschauungszwecke

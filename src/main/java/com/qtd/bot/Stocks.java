@@ -18,7 +18,7 @@ public class Stocks implements Command {
 
     final String COMMAND_OPTIONAL = " <symbol> <option>";
 
-    final String DESCRIPTION = "Gibt den aktuellen Preis der Aktie zurück.\n <symbol> = Symbol der Aktie (z.B. AAPL oder Apple)\n<option> = graph -> Stellt die Preisentwicklung als Graph dar";
+    final String DESCRIPTION = "Gibt den aktuellen Preis der Aktie zurück.\n <symbol> = Symbol der Aktie (z.B. AAPL oder Apple)\n<option> = graph -> Stellt die Preisentwicklung als Graph dar. Intervalle möglich (z.B. 2d, 1mo, 1y, max).";
 
     final String yApiKey = "Q1Yr5GUeEW5pGzDq094gO6k8SQzsdgul4lqV304O";
 
@@ -43,10 +43,17 @@ public class Stocks implements Command {
         String symbol = "";
 
         if(option.contains(" ")){
-            symbol = parseQueryToSymbol(option.substring(0, option.lastIndexOf(' ')));
+            symbol = parseQueryToSymbol(option.substring(0, option.indexOf(' ')));
 
             if(option.contains("graph")){
-                printGraph(event, symbol);
+
+                String possibleTimeInterval = option.substring(option.indexOf("graph"));
+
+                if(possibleTimeInterval.contains(" ")){
+                    printGraph(event, symbol, option.substring(option.lastIndexOf(' ')+1));
+                } else {
+                    printGraph(event, symbol, null);
+                }
             }
 
         } else {
@@ -107,12 +114,16 @@ public class Stocks implements Command {
         return null;
     }
 
-    void printGraph(MessageCreateEvent event, String symbol){
+    void printGraph(MessageCreateEvent event, String symbol, String range) {
+
+        if (range == null || range.equalsIgnoreCase("") ||range.equalsIgnoreCase(" ")){
+            range = "1d";
+        }
 
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("https://yfapi.net/v8/finance/spark?interval=1h&range=1d&symbols=" + symbol)
+                .url("https://yfapi.net/v8/finance/spark?interval=1h&range=" + range + "&symbols=" + symbol)
                 .header("x-api-key", yApiKey)
                 .build();
 
@@ -139,7 +150,7 @@ public class Stocks implements Command {
             e.printStackTrace();
         }
 
-        event.getChannel().sendMessage("Preisentwicklung von " + symbol + " in den letzten 24h (in $):");
+        event.getChannel().sendMessage("Preisentwicklung von " + symbol + " (in $):");
         event.getChannel().sendMessage(GraphGenerator.generateGraph(data, symbol));
     }
 }
