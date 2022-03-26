@@ -24,8 +24,8 @@ public class Music implements Command {
 
     final String COMMAND_OPTIONAL = " <option>";
 
-    final String DESCRIPTION = "Joint in den Voice Channel und kann Musik abspielen.\n\n<option> = Audio-URL (z.B. YouTube)\nFügt weitere Lieder automatisch zur Queue hinzu\n\nskip = Springt zum nächsten Lied der Queue" +
-            "\nqueue = Zeigt alle Lieder der aktuellen Queue an\n\nstop = Beendet die Wiedergabe";
+    final String DESCRIPTION = "Joint in den Voice Channel und spielt Musik ab.\n\n<option> = Audio-URL (z.B. YouTube)\nFügt weitere Lieder automatisch zur Queue hinzu\n\nskip = Springt zum nächsten Lied der Queue" +
+            "\nloop = Aktiviert oder deaktiviert die Loopfunktion des akutellen Liedes\nqueue = Zeigt alle Lieder der aktuellen Queue an\n\nstop = Beendet die Wiedergabe";
 
     ServerVoiceChannel channel;
 
@@ -72,21 +72,40 @@ public class Music implements Command {
         if (userVoiceChannelId != 0) {
 
             if(option.equals("skip")){
+
                 if(channel != null && trackScheduler != null){
                     trackScheduler.skip();
-                    return;
                 } else {
-                    event.getChannel().sendMessage("Nichts zu skippen :x: ");
-                    return;
+                    event.getChannel().sendMessage("Gibt nichts zu skippen :x: ");
                 }
+
+                return;
             } else if(option.equals("queue")){
+
                 if(channel != null && trackScheduler != null){
                     trackScheduler.queueInfo();
-                    return;
                 } else {
                     event.getChannel().sendMessage("Keine Queue vorhanden :x: ");
-                    return;
                 }
+
+                return;
+            } else if(option.equals("loop")){
+
+                if(channel != null && trackScheduler != null && player != null && !player.isPaused()){
+
+                    if(trackScheduler.loop){
+                        trackScheduler.loop = false;
+                        event.getChannel().sendMessage("Loop beendet :white_check_mark: ");
+                    } else {
+                        trackScheduler.loop = true;
+                        event.getChannel().sendMessage("Track wird wiederholt :white_check_mark: ");
+                    }
+
+                } else {
+                    event.getChannel().sendMessage("Gibt nichts zu loopen :x: ");
+                }
+
+                return;
             }
 
             if(channel != null){

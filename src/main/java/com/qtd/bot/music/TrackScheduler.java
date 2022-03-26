@@ -17,6 +17,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
     MessageCreateEvent event;
 
+    boolean loop = false;
+
     public TrackScheduler(AudioPlayer player) {
         this.player = player;
     }
@@ -33,9 +35,13 @@ public class TrackScheduler extends AudioEventAdapter {
         event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
 
         if (endReason.mayStartNext) {
-            queue.remove(0);
-            if(!queue.isEmpty()){
-                this.player.playTrack(queue.get(0));
+            if(loop) {
+                this.player.playTrack(track.makeClone());
+            } else {
+                queue.remove(0);
+                if(!queue.isEmpty()){
+                    this.player.playTrack(queue.get(0));
+                }
             }
         }
 
@@ -69,7 +75,7 @@ public class TrackScheduler extends AudioEventAdapter {
             this.player.playTrack(queue.get(0));
             event.getChannel().sendMessage("Track skipped :white_check_mark: ");
         } else {
-            event.getChannel().sendMessage("Nichts zu skippen :x: ");
+            event.getChannel().sendMessage("Gibt nichts zu skippen :x: ");
         }
     }
 
