@@ -76,11 +76,19 @@ public class TrackScheduler extends AudioEventAdapter {
 
         if (!queue.isEmpty()){
             for (AudioTrack track: queue) {
-                queueMessage.append(queue.indexOf(track)+1 + ". " + track.getInfo().title).append("\n");
+                int index = queue.indexOf(track)+1;
+
+                // After 10 entries the string gets sent and a new is created to prevent char[] overflows
+                if(index % 10 == 0){
+                    queueMessage.append(index + ". " + track.getInfo().title).append("\n");
+                    event.getChannel().sendMessage(queueMessage.toString());
+                    queueMessage = new StringBuilder();
+                } else {
+                    queueMessage.append(index + ". " + track.getInfo().title).append("\n");
+                }
             }
 
             event.getChannel().sendMessage(queueMessage.toString());
-
         } else {
             event.getChannel().sendMessage("Keine Queue vorhanden :x: ");
         }
