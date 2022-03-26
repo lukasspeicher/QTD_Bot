@@ -2,6 +2,9 @@ package com.qtd.bot;
 
 import java.util.ArrayList;
 
+import com.qtd.bot.music.Music;
+import com.qtd.bot.stonks.Crypto;
+import com.qtd.bot.stonks.Stocks;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
@@ -9,7 +12,7 @@ public class QTDBot {
     
     final static String COMMAND_PREFIX = "!";
 
-    final static String DEFAULT_ACTIVITY = "!help | Zeigt alle Commands";
+    public final static String DEFAULT_ACTIVITY = "!help | Zeigt alle Commands";
 
     static ArrayList<Command> commands = new ArrayList<>();
 
@@ -19,7 +22,6 @@ public class QTDBot {
         api.updateActivity(DEFAULT_ACTIVITY);
 
         commands.add(new Help());
-        commands.add(new Ping());
         commands.add(new Crypto());
         commands.add(new Music());
         commands.add(new Stocks());
