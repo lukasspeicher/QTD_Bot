@@ -142,14 +142,15 @@ public class Music implements Command {
         playerManager.loadItem(option, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                trackScheduler.queue(event, track);
+                trackScheduler.queue(event, track, false);
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
                 for (AudioTrack track : playlist.getTracks()) {
-                    trackScheduler.queue(event, track);
+                    trackScheduler.queue(event, track, true);
                 }
+                event.getChannel().sendMessage("Playlist wurde zur Queue hinzugefügt :white_check_mark: ");
             }
 
             @Override

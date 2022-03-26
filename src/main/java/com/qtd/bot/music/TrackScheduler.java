@@ -47,7 +47,7 @@ public class TrackScheduler extends AudioEventAdapter {
         //                       clone of this back to your queue
     }
 
-    public void queue(MessageCreateEvent event, AudioTrack track){
+    public void queue(MessageCreateEvent event, AudioTrack track, boolean isPlaylist){
         this.event = event;
 
         if(queue.isEmpty()){
@@ -55,7 +55,10 @@ public class TrackScheduler extends AudioEventAdapter {
             player.playTrack(track);
         } else {
             queue.add(track);
-            event.getChannel().sendMessage("Track wurde zur Queue hinzugefügt :white_check_mark: ");
+
+            if(!isPlaylist) {
+                event.getChannel().sendMessage("Track wurde zur Queue hinzugefügt :white_check_mark: ");
+            }
         }
     }
 
