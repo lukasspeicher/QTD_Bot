@@ -1,6 +1,7 @@
 package com.qtd.bot.stonks;
 
 import com.qtd.bot.Command;
+import com.qtd.bot.QTDBot;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -82,10 +83,12 @@ public class Stocks implements Command {
 
             output += price + " $";
 
+            QTDBot.LOGGER.info("Stock message sent to channel");
 
             event.getChannel().sendMessage(output);
 
         } catch (IOException | JSONException e) {
+            QTDBot.LOGGER.warning("Stock request not successful: " + e.getMessage());
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
             e.printStackTrace();
         }
@@ -106,9 +109,11 @@ public class Stocks implements Command {
 
             JSONObject result = json.getJSONObject("ResultSet").getJSONArray("Result").getJSONObject(0);
 
+            QTDBot.LOGGER.info("Symbol resolution request successful");
+
             return result.getString("symbol");
         } catch (IOException | JSONException e) {
-
+            QTDBot.LOGGER.warning("Symbol resolution request not successful: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -146,11 +151,13 @@ public class Stocks implements Command {
                 data.add(value);
             }
 
+            QTDBot.LOGGER.info("Data request for generating graph successful");
         } catch (IOException | JSONException e) {
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
             e.printStackTrace();
         }
 
+        QTDBot.LOGGER.info("Sent graph to channel");
         event.getChannel().sendMessage("Preisentwicklung von " + symbol + " (in $):");
         event.getChannel().sendMessage(GraphGenerator.generateGraph(data, symbol));
     }

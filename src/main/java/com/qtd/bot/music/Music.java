@@ -48,11 +48,14 @@ public class Music implements Command {
     public void sendEventMessage(MessageCreateEvent event, String option) {
 
         if(option.equals("stop")){
+            QTDBot.LOGGER.info("Music stopped by user command");
             try {
                 event.getServer().get().getAudioConnection().get().close();
                 channel = null;
+                QTDBot.LOGGER.info("Closed audio connection");
             } catch (NoSuchElementException e){
                 event.getChannel().sendMessage("Mit keinem Voice-Channel verbunden");
+                QTDBot.LOGGER.info("User tried to stop music but not connected to any voice channel");
             }
             event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
             return;
@@ -75,8 +78,10 @@ public class Music implements Command {
 
                 if(channel != null && trackScheduler != null){
                     trackScheduler.skip();
+                    QTDBot.LOGGER.info("Song skipped by user command");
                 } else {
                     event.getChannel().sendMessage("Gibt nichts zu skippen :x: ");
+                    QTDBot.LOGGER.info("User tried to skip but no music is played");
                 }
 
                 return;
@@ -84,8 +89,10 @@ public class Music implements Command {
 
                 if(channel != null && trackScheduler != null){
                     trackScheduler.queueInfo();
+                    QTDBot.LOGGER.info("Queue info sent to channel by user command");
                 } else {
                     event.getChannel().sendMessage("Keine Queue vorhanden :x: ");
+                    QTDBot.LOGGER.info("User tried to show queue but no queue available");
                 }
 
                 return;
@@ -96,13 +103,16 @@ public class Music implements Command {
                     if(trackScheduler.loop){
                         trackScheduler.loop = false;
                         event.getChannel().sendMessage("Loop beendet :white_check_mark: ");
+                        QTDBot.LOGGER.info("Ended loop by user command");
                     } else {
                         trackScheduler.loop = true;
                         event.getChannel().sendMessage("Track wird wiederholt :white_check_mark: ");
+                        QTDBot.LOGGER.info("Started loop by user command");
                     }
 
                 } else {
                     event.getChannel().sendMessage("Gibt nichts zu loopen :x: ");
+                    QTDBot.LOGGER.info("User tried to loop but no loop activated");
                 }
 
                 return;
@@ -111,19 +121,25 @@ public class Music implements Command {
             if(channel != null){
                 channel.getLatestInstance().thenAccept(audioConnection -> {
 
+                    QTDBot.LOGGER.info("User sent music command. Already connected to channel");
+
                     play(event, option);
 
                 }).exceptionally(e -> {
                     // Failed to connect to voice channel (no permissions?)
+                    QTDBot.LOGGER.severe("Failed to retrieve to voice channel although connected to it: " + e.getMessage());
                     e.printStackTrace();
                     event.getChannel().sendMessage("Verbindung zum Channel fehlgeschlagen");
                     return null;
                 });
             } else {
+                QTDBot.LOGGER.info("User sent music command. Not yet connected to channel");
                 try {
 
                     channel = event.getApi().getServerVoiceChannelById(userVoiceChannelId).get();
                     channel.connect().thenAccept(audioConnection -> {
+
+                        QTDBot.LOGGER.info("Channel received. Initializing player");
 
                         // Create a player manager
                         playerManager = new DefaultAudioPlayerManager();
@@ -137,30 +153,39 @@ public class Music implements Command {
                         AudioSource source = new LavaplayerAudioSource(event.getApi(), player);
                         audioConnection.setAudioSource(source);
 
+                        QTDBot.LOGGER.info(" Successfully initialized player, trackScheduler and audioSource");
+
                         play(event, option);
 
                     }).exceptionally(e -> {
                         // Failed to connect to voice channel (no permissions?)
+                        QTDBot.LOGGER.severe("Failed to connect to voice channel: " + e.getMessage());
                         e.printStackTrace();
                         event.getChannel().sendMessage("Verbindung zum Channel fehlgeschlagen");
                         return null;
                     });
 
                 } catch (Exception ex) {
+                    QTDBot.LOGGER.severe("Failed to initialize audio connection: " + ex.getMessage());
                     ex.printStackTrace();
                     event.getChannel().sendMessage("Verbindungsaufbau fehlgeschlagen");
                 }
             }
 
         } else {
+            QTDBot.LOGGER.info(" User sent music command but is not connected to a voice channel");
             event.getChannel().sendMessage("Du musst im Voice-Channel sein, um music-Befehle zu geben");
         }
     }
 
     private void play(MessageCreateEvent event, String option) {
+
+        QTDBot.LOGGER.info(" User sent the following url to player: " + option);
+
         playerManager.loadItem(option, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
+                QTDBot.LOGGER.info(" Added track to player: " + track.getInfo().title);
                 trackScheduler.queue(event, track, false);
             }
 
@@ -169,18 +194,21 @@ public class Music implements Command {
                 for (AudioTrack track : playlist.getTracks()) {
                     trackScheduler.queue(event, track, true);
                 }
+                QTDBot.LOGGER.info(" Added playlist to queue: " + playlist.getName());
                 event.getChannel().sendMessage("Playlist wurde zur Queue hinzugefügt :white_check_mark: ");
             }
 
             @Override
             public void noMatches() {
                 // nothing found
+                QTDBot.LOGGER.info(" No content for given url found");
                 event.getChannel().sendMessage("Kein Inhalt gefunden");
             }
 
             @Override
             public void loadFailed(FriendlyException throwable) {
                 // Loading failed
+                QTDBot.LOGGER.info(" Content loading failed: " + throwable.getMessage());
                 event.getChannel().sendMessage("Laden fehlgeschlagen");
             }
         });

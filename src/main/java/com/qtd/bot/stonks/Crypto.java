@@ -1,6 +1,7 @@
 package com.qtd.bot.stonks;
 
 import com.qtd.bot.Command;
+import com.qtd.bot.QTDBot;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -88,9 +89,11 @@ public class Crypto implements Command {
                 output += formatter.format(price_value*Currency.usdToEur) + " €";
             }
 
+            QTDBot.LOGGER.info("Crypto message sent to channel");
             event.getChannel().sendMessage(output);
 
         } catch (IOException | JSONException e) {
+            QTDBot.LOGGER.warning("Crypto message could not be generated: " + e.getMessage());
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
             e.printStackTrace();
         }
@@ -131,11 +134,14 @@ public class Crypto implements Command {
                 data.add(new SpecificValue(jsonArray.getJSONObject(i).get("priceUsd").toString(), new Timestamp(Long.parseLong(jsonArray.getJSONObject(i).get("time").toString()))));
             }
 
+            QTDBot.LOGGER.info("Time interval for crypto generated");
         } catch (IOException | JSONException e) {
+            QTDBot.LOGGER.warning("Crypto time interval could not be generated: " + e.getMessage());
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
             e.printStackTrace();
         }
 
+        QTDBot.LOGGER.info("Sent graph to channel");
         event.getChannel().sendMessage("Preisentwicklung von " + crypto + " (in $):");
         event.getChannel().sendMessage(GraphGenerator.generateGraph(data, crypto));
     }
@@ -177,7 +183,10 @@ public class Crypto implements Command {
 
             Currency.timestampLastRequest = new Timestamp(new java.util.Date().getTime());
 
+            QTDBot.LOGGER.info("New currency exchange value retrieved");
+
         } catch (IOException | JSONException e) {
+            QTDBot.LOGGER.severe("Currency exchange value could not be retrieved: " + e.getMessage());
             e.printStackTrace();
         }
 

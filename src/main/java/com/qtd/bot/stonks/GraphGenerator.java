@@ -1,5 +1,6 @@
 package com.qtd.bot.stonks;
 
+import com.qtd.bot.QTDBot;
 import io.quickchart.QuickChart;
 
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ public class GraphGenerator {
         chart.setHeight(500);
         chart.setBackgroundColor("#ffffff");
         chart.setConfig(result.toString());
+
+        QTDBot.LOGGER.info("Specific chart generated");
 
         return chart.getShortUrl();
     }

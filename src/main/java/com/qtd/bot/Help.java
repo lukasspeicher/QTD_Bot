@@ -38,6 +38,6 @@ public class Help implements Command{
         }
 
         event.getChannel().sendMessage(embed);
-
+        QTDBot.LOGGER.info("Help command sent to channel");
     }
 }
