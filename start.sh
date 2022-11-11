@@ -1,3 +1,3 @@
 #!/bin/bash
 pkill -f 'java -jar'
-java -jar QTD_Bot-1.0-SNAPSHOT-shaded.jar $1
+java -jar ./target/QTD_Bot-*-SNAPSHOT-shaded.jar $1
