@@ -40,7 +40,7 @@ public class QTDBot {
             LOGGER.severe("Logging initialisation failed: " + e.getMessage());
         }
 
-        DiscordApi api = new DiscordApiBuilder().setToken(args[0]).login().join();
+        DiscordApi api = new DiscordApiBuilder().setToken(args[0]).setAllIntents().login().join();
         api.updateActivity(DEFAULT_ACTIVITY);
 
         commands.add(new Help());

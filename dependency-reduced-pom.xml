@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.qtd</groupId>
   <artifactId>QTD_Bot</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
@@ -69,7 +69,7 @@
     <dependency>
       <groupId>org.javacord</groupId>
       <artifactId>javacord</artifactId>
-      <version>3.5.0</version>
+      <version>3.6.0</version>
       <type>pom</type>
       <scope>compile</scope>
     </dependency>
