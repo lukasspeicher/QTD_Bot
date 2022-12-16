@@ -36,12 +36,12 @@ public class TrackScheduler extends AudioEventAdapter {
         event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
 
         if (endReason.mayStartNext) {
-            if(loop) {
+            if (loop) {
                 QTDBot.LOGGER.info("Play track again because of loop");
                 this.player.playTrack(track.makeClone());
             } else {
                 queue.remove(0);
-                if(!queue.isEmpty()){
+                if (!queue.isEmpty()) {
                     QTDBot.LOGGER.info("Play next item in queue");
                     this.player.playTrack(queue.get(0));
                 }
@@ -56,16 +56,16 @@ public class TrackScheduler extends AudioEventAdapter {
         //                       clone of this back to your queue
     }
 
-    public void queue(MessageCreateEvent event, AudioTrack track, boolean isPlaylist){
+    public void queue(MessageCreateEvent event, AudioTrack track, boolean isPlaylist) {
         this.event = event;
 
-        if(queue.isEmpty()){
+        if (queue.isEmpty()) {
             queue.add(track);
             player.playTrack(track);
         } else {
             queue.add(track);
 
-            if(!isPlaylist) {
+            if (!isPlaylist) {
                 QTDBot.LOGGER.info("Added track to queue" + track.getInfo().title);
                 event.getChannel().sendMessage("Track wurde zur Queue hinzugefügt :white_check_mark: ");
             }
@@ -73,7 +73,7 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void skip() {
-        if(queue.size() >= 2){
+        if (queue.size() >= 2) {
             player.stopTrack();
             queue.remove(0);
             this.player.playTrack(queue.get(0));
@@ -87,12 +87,12 @@ public class TrackScheduler extends AudioEventAdapter {
 
         StringBuilder queueMessage = new StringBuilder();
 
-        if (!queue.isEmpty()){
-            for (AudioTrack track: queue) {
-                int index = queue.indexOf(track)+1;
+        if (!queue.isEmpty()) {
+            for (AudioTrack track : queue) {
+                int index = queue.indexOf(track) + 1;
 
                 // After 10 entries the string gets sent and a new is created to prevent char[] overflows
-                if(index % 10 == 0){
+                if (index % 10 == 0) {
                     queueMessage.append(index + ". " + track.getInfo().title).append("\n");
                     event.getChannel().sendMessage(queueMessage.toString());
                     queueMessage = new StringBuilder();

@@ -36,24 +36,30 @@ public class Music implements Command {
     TrackScheduler trackScheduler;
 
     @Override
-    public String getCommand() { return COMMAND; }
+    public String getCommand() {
+        return COMMAND;
+    }
 
     @Override
-    public String getCommandOptional() { return COMMAND_OPTIONAL; }
+    public String getCommandOptional() {
+        return COMMAND_OPTIONAL;
+    }
 
     @Override
-    public String getDescription() { return DESCRIPTION; }
+    public String getDescription() {
+        return DESCRIPTION;
+    }
 
     @Override
     public void sendEventMessage(MessageCreateEvent event, String option) {
 
-        if(option.equals("stop")){
+        if (option.equals("stop")) {
             QTDBot.LOGGER.info("Music stopped by user command");
             try {
                 event.getServer().get().getAudioConnection().get().close();
                 channel = null;
                 QTDBot.LOGGER.info("Closed audio connection");
-            } catch (NoSuchElementException e){
+            } catch (NoSuchElementException e) {
                 event.getChannel().sendMessage("Mit keinem Voice-Channel verbunden");
                 QTDBot.LOGGER.info("User tried to stop music but not connected to any voice channel");
             }
@@ -74,9 +80,9 @@ public class Music implements Command {
         // If User is connected
         if (userVoiceChannelId != 0) {
 
-            if(option.equals("skip")){
+            if (option.equals("skip")) {
 
-                if(channel != null && trackScheduler != null){
+                if (channel != null && trackScheduler != null) {
                     trackScheduler.skip();
                     QTDBot.LOGGER.info("Song skipped by user command");
                 } else {
@@ -85,9 +91,9 @@ public class Music implements Command {
                 }
 
                 return;
-            } else if(option.equals("queue")){
+            } else if (option.equals("queue")) {
 
-                if(channel != null && trackScheduler != null){
+                if (channel != null && trackScheduler != null) {
                     trackScheduler.queueInfo();
                     QTDBot.LOGGER.info("Queue info sent to channel by user command");
                 } else {
@@ -96,11 +102,11 @@ public class Music implements Command {
                 }
 
                 return;
-            } else if(option.equals("loop")){
+            } else if (option.equals("loop")) {
 
-                if(channel != null && trackScheduler != null && player != null && !player.isPaused()){
+                if (channel != null && trackScheduler != null && player != null && !player.isPaused()) {
 
-                    if(trackScheduler.loop){
+                    if (trackScheduler.loop) {
                         trackScheduler.loop = false;
                         event.getChannel().sendMessage("Loop beendet :white_check_mark: ");
                         QTDBot.LOGGER.info("Ended loop by user command");
@@ -118,7 +124,7 @@ public class Music implements Command {
                 return;
             }
 
-            if(channel != null){
+            if (channel != null) {
                 channel.getLatestInstance().thenAccept(audioConnection -> {
 
                     QTDBot.LOGGER.info("User sent music command. Already connected to channel");

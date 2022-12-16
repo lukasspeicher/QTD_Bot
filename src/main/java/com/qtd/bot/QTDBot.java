@@ -15,7 +15,7 @@ import org.javacord.api.DiscordApiBuilder;
 public class QTDBot {
 
     public final static Logger LOGGER = Logger.getLogger("QTDBotLogger");
-    
+
     final static String COMMAND_PREFIX = "!";
 
     public final static String DEFAULT_ACTIVITY = "!help | Zeigt alle Commands";
@@ -27,7 +27,7 @@ public class QTDBot {
         try {
 
             // This block configure the logger with handler and formatter
-            FileHandler fileHandler = new FileHandler("./"+ System.currentTimeMillis() + ".log");
+            FileHandler fileHandler = new FileHandler("./" + System.currentTimeMillis() + ".log");
             LOGGER.addHandler(fileHandler);
             SimpleFormatter formatter = new SimpleFormatter();
             fileHandler.setFormatter(formatter);
@@ -51,7 +51,7 @@ public class QTDBot {
         for (Command command : commands) {
             api.addMessageCreateListener(event -> {
                 if (event.getMessageContent().contains(COMMAND_PREFIX + command.getCommand())) {
-                    command.sendEventMessage(event, event.getMessageContent().substring(event.getMessageContent().indexOf(' ')+1));
+                    command.sendEventMessage(event, event.getMessageContent().substring(event.getMessageContent().indexOf(' ') + 1));
                 }
             });
         }
