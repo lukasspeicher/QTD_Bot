@@ -32,7 +32,7 @@ public class TrackScheduler extends AudioEventAdapter {
     // AudioEventAdapter
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        QTDBot.LOGGER.info("Track ended: " + track.getInfo().title);
+        QTDBot.LOGGER.info("Track ended: " + endReason.toString() + "(" + track.getInfo().title + ")");
         event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
 
         if (endReason.mayStartNext) {
