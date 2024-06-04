@@ -25,7 +25,6 @@ public class QTDBot {
     public static void main(String[] args) {
 
         try {
-
             // This block configure the logger with handler and formatter
             FileHandler fileHandler = new FileHandler("./" + System.currentTimeMillis() + ".log");
             LOGGER.addHandler(fileHandler);
@@ -34,9 +33,7 @@ public class QTDBot {
 
             // First logging
             LOGGER.info("Logger initialised");
-
         } catch (SecurityException | IOException e) {
-            e.printStackTrace();
             LOGGER.severe("Logging initialisation failed: " + e.getMessage());
         }
 
@@ -60,7 +57,6 @@ public class QTDBot {
 
         // Prints the invite url
         System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
-
     }
 
 }

@@ -95,7 +95,6 @@ public class Crypto implements Command {
         } catch (IOException | JSONException e) {
             QTDBot.LOGGER.warning("Crypto message could not be generated: " + e.getMessage());
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
-            e.printStackTrace();
         }
 
     }
@@ -138,7 +137,6 @@ public class Crypto implements Command {
         } catch (IOException | JSONException e) {
             QTDBot.LOGGER.warning("Crypto time interval could not be generated: " + e.getMessage());
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
-            e.printStackTrace();
         }
 
         QTDBot.LOGGER.info("Sent graph to channel");
@@ -187,7 +185,6 @@ public class Crypto implements Command {
 
         } catch (IOException | JSONException e) {
             QTDBot.LOGGER.severe("Currency exchange value could not be retrieved: " + e.getMessage());
-            e.printStackTrace();
         }
 
     }

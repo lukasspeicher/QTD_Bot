@@ -90,7 +90,6 @@ public class Stocks implements Command {
         } catch (IOException | JSONException e) {
             QTDBot.LOGGER.warning("Stock request not successful: " + e.getMessage());
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
-            e.printStackTrace();
         }
 
     }
@@ -114,7 +113,6 @@ public class Stocks implements Command {
             return result.getString("symbol");
         } catch (IOException | JSONException e) {
             QTDBot.LOGGER.warning("Symbol resolution request not successful: " + e.getMessage());
-            e.printStackTrace();
         }
 
         return null;
@@ -154,7 +152,7 @@ public class Stocks implements Command {
             QTDBot.LOGGER.info("Data request for generating graph successful");
         } catch (IOException | JSONException e) {
             event.getChannel().sendMessage("Name oder Symbol nicht gefunden");
-            e.printStackTrace();
+            QTDBot.LOGGER.warning("Name or Symbol not found: " + e.getMessage());
         }
 
         QTDBot.LOGGER.info("Sent graph to channel");

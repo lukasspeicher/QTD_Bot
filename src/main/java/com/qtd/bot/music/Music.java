@@ -10,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import org.javacord.api.audio.AudioSource;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
@@ -24,8 +25,7 @@ public class Music implements Command {
 
     final String COMMAND_OPTIONAL = " <option>";
 
-    final String DESCRIPTION = "Joint in den Voice Channel und spielt Musik ab.\n\n<option> = Audio-URL (z.B. YouTube)\nFügt weitere Lieder automatisch zur Queue hinzu\n\nskip = Springt zum nächsten Lied der Queue" +
-            "\nloop = Aktiviert oder deaktiviert die Loopfunktion des akutellen Liedes\nqueue = Zeigt alle Lieder der aktuellen Queue an\n\nstop = Beendet die Wiedergabe";
+    final String DESCRIPTION = "Joint in den Voice Channel und spielt Musik ab.\n\n<option> = Audio-URL (z.B. YouTube)\nFügt weitere Lieder automatisch zur Queue hinzu\n\nskip = Springt zum nächsten Lied der Queue" + "\nloop = Aktiviert oder deaktiviert die Loopfunktion des akutellen Liedes\nqueue = Zeigt alle Lieder der aktuellen Queue an\n\nstop = Beendet die Wiedergabe";
 
     ServerVoiceChannel channel;
 
@@ -134,7 +134,6 @@ public class Music implements Command {
                 }).exceptionally(e -> {
                     // Failed to connect to voice channel (no permissions?)
                     QTDBot.LOGGER.severe("Failed to retrieve to voice channel although connected to it: " + e.getMessage());
-                    e.printStackTrace();
                     event.getChannel().sendMessage("Verbindung zum Channel fehlgeschlagen");
                     return null;
                 });
@@ -149,7 +148,11 @@ public class Music implements Command {
 
                         // Create a player manager
                         playerManager = new DefaultAudioPlayerManager();
-                        AudioSourceManagers.registerRemoteSources(playerManager);
+
+                        //AudioSourceManagers.registerRemoteSources(playerManager);
+
+                        playerManager.registerSourceManager(new YoutubeAudioSourceManager());
+
                         player = playerManager.createPlayer();
 
                         trackScheduler = new TrackScheduler(player);
@@ -166,14 +169,12 @@ public class Music implements Command {
                     }).exceptionally(e -> {
                         // Failed to connect to voice channel (no permissions?)
                         QTDBot.LOGGER.severe("Failed to connect to voice channel: " + e.getMessage());
-                        e.printStackTrace();
                         event.getChannel().sendMessage("Verbindung zum Channel fehlgeschlagen");
                         return null;
                     });
 
                 } catch (Exception ex) {
                     QTDBot.LOGGER.severe("Failed to initialize audio connection: " + ex.getMessage());
-                    ex.printStackTrace();
                     event.getChannel().sendMessage("Verbindungsaufbau fehlgeschlagen");
                 }
             }
@@ -207,14 +208,14 @@ public class Music implements Command {
             @Override
             public void noMatches() {
                 // nothing found
-                QTDBot.LOGGER.info(" No content for given url found");
+                QTDBot.LOGGER.warning(" No content for given url found");
                 event.getChannel().sendMessage("Kein Inhalt gefunden");
             }
 
             @Override
             public void loadFailed(FriendlyException throwable) {
                 // Loading failed
-                QTDBot.LOGGER.info(" Content loading failed: " + throwable.getMessage());
+                QTDBot.LOGGER.warning(" Content loading failed: " + throwable.getMessage());
                 event.getChannel().sendMessage("Laden fehlgeschlagen");
             }
         });
