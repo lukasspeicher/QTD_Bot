@@ -7,16 +7,16 @@ import java.util.ArrayList;
 
 public class GraphGenerator {
 
-    public static String generateGraph (ArrayList<SpecificValue> data, String item) {
+    public static String generateGraph(ArrayList<SpecificValue> data, String item) {
 
         double priceBefore = Double.parseDouble(data.get(0).getPriceUSD());
-        double priceNow = Double.parseDouble(data.get(data.size()-1).getPriceUSD());
+        double priceNow = Double.parseDouble(data.get(data.size() - 1).getPriceUSD());
 
         int r = 204;
         int g = 0;
         int b = 0;
 
-        if(priceNow >= priceBefore){
+        if (priceNow >= priceBefore) {
             r = 0;
             g = 204;
         }
@@ -26,8 +26,8 @@ public class GraphGenerator {
                 + "    data: {"
                 + "        labels: [");
 
-        for (SpecificValue value: data) {
-            if (data.indexOf(value) == data.size()-1) {
+        for (SpecificValue value : data) {
+            if (data.indexOf(value) == data.size() - 1) {
                 result.append("'").append(value.getTimestamp()).append("'");
             } else {
                 result.append("'").append(value.getTimestamp()).append("', ");
@@ -35,12 +35,12 @@ public class GraphGenerator {
         }
 
         result.append("],"
-                + "        datasets: [{"
-                + "            label: '").append(item.toUpperCase()).append("',")
+                        + "        datasets: [{"
+                        + "            label: '").append(item.toUpperCase()).append("',")
                 .append("            data: [");
 
-        for (SpecificValue value: data) {
-            if (data.indexOf(value) == data.size()-1) {
+        for (SpecificValue value : data) {
+            if (data.indexOf(value) == data.size() - 1) {
                 result.append(value.getPriceUSD());
             } else {
                 result.append(value.getPriceUSD()).append(", ");

@@ -30,10 +30,14 @@ public class Crypto implements Command {
     }
 
     @Override
-    public String getCommandOptional() { return COMMAND_OPTIONAL; }
+    public String getCommandOptional() {
+        return COMMAND_OPTIONAL;
+    }
 
     @Override
-    public String getDescription() { return DESCRIPTION; }
+    public String getDescription() {
+        return DESCRIPTION;
+    }
 
     @Override
     public void sendEventMessage(MessageCreateEvent event, String option) {
@@ -44,16 +48,16 @@ public class Crypto implements Command {
 
         String currency = "";
 
-        if(option.contains(" ")){
+        if (option.contains(" ")) {
             crypto = option.substring(0, option.indexOf(' '));
 
-            currency = option.substring(option.indexOf(' ')+1, option.indexOf(' ')+2);
+            currency = option.substring(option.indexOf(' ') + 1, option.indexOf(' ') + 2);
 
-            if(option.contains("graph")) {
+            if (option.contains("graph")) {
                 String possibleTimeInterval = option.substring(option.indexOf("graph"));
 
-                if(possibleTimeInterval.contains("d")){
-                    printGraph(event, crypto, option.substring(option.lastIndexOf(' ')+1));
+                if (possibleTimeInterval.contains("d")) {
+                    printGraph(event, crypto, option.substring(option.lastIndexOf(' ') + 1));
                 } else {
                     printGraph(event, crypto, null);
                 }
@@ -63,30 +67,28 @@ public class Crypto implements Command {
 
         OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .url("https://api.coincap.io/v2/assets/" + crypto.toLowerCase())
-                .build();
+        Request request = new Request.Builder().url("https://api.coincap.io/v2/assets/" + crypto.toLowerCase()).build();
 
         try (Response response = client.newCall(request).execute()) {
 
-            JSONObject  json = new JSONObject (response.body().string());
+            JSONObject json = new JSONObject(response.body().string());
 
             String price = json.getJSONObject("data").get("priceUsd").toString();
 
-            double price_value = Double.parseDouble(price.substring(0, price.lastIndexOf('.')+3));
+            double price_value = Double.parseDouble(price.substring(0, price.lastIndexOf('.') + 3));
             DecimalFormat formatter = new DecimalFormat("#,###.00");
 
             String output = "";
 
             output += "Aktueller Preis von " + crypto + ":\n";
 
-            if (currency.equals("€")){
-                output += formatter.format(price_value*Currency.usdToEur) + " €";
-            } else if (currency.equals("$")){
+            if (currency.equals("€")) {
+                output += formatter.format(price_value * Currency.usdToEur) + " €";
+            } else if (currency.equals("$")) {
                 output += formatter.format(price_value) + " $";
             } else {
                 output += formatter.format(price_value) + " $\n";
-                output += formatter.format(price_value*Currency.usdToEur) + " €";
+                output += formatter.format(price_value * Currency.usdToEur) + " €";
             }
 
             QTDBot.LOGGER.info("Crypto message sent to channel");
@@ -99,7 +101,7 @@ public class Crypto implements Command {
 
     }
 
-    void printGraph(MessageCreateEvent event, String crypto, String givenInterval){
+    void printGraph(MessageCreateEvent event, String crypto, String givenInterval) {
 
         Timestamp currentTime;
         Timestamp startTime;
@@ -109,7 +111,7 @@ public class Crypto implements Command {
             int timeInterval = Integer.parseInt(givenInterval.substring(0, givenInterval.indexOf('d')));
 
             currentTime = new Timestamp(new Date().getTime());
-            startTime = new Timestamp(currentTime.getTime() - ((1000 * 60 * 60 * 24)*timeInterval));
+            startTime = new Timestamp(currentTime.getTime() - ((1000 * 60 * 60 * 24) * timeInterval));
         } else {
             currentTime = new Timestamp(new Date().getTime());
             startTime = new Timestamp(currentTime.getTime() - (1000 * 60 * 60 * 24));
@@ -117,15 +119,13 @@ public class Crypto implements Command {
 
         OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .url("https://api.coincap.io/v2/assets/" + crypto.toLowerCase() + "/history?interval=h1&start=" + startTime.getTime() + "&end=" + currentTime.getTime())
-                .build();
+        Request request = new Request.Builder().url("https://api.coincap.io/v2/assets/" + crypto.toLowerCase() + "/history?interval=h1&start=" + startTime.getTime() + "&end=" + currentTime.getTime()).build();
 
         ArrayList<SpecificValue> data = new ArrayList<>();
 
         try (Response response = client.newCall(request).execute()) {
 
-            JSONObject  json = new JSONObject (response.body().string());
+            JSONObject json = new JSONObject(response.body().string());
 
             JSONArray jsonArray = json.getJSONArray("data");
 
@@ -144,8 +144,8 @@ public class Crypto implements Command {
         event.getChannel().sendMessage(GraphGenerator.generateGraph(data, crypto));
     }
 
-    void checkCurrencyExchange(){
-        if(Currency.timestampLastRequest == null){
+    void checkCurrencyExchange() {
+        if (Currency.timestampLastRequest == null) {
             CurrencyRequest();
         } else {
             java.util.Date date = new java.util.Date();
@@ -155,7 +155,7 @@ public class Crypto implements Command {
 
             long minutes = diffMilliseconds / (60 * 1000);
 
-            if(minutes > 60){
+            if (minutes > 60) {
                 CurrencyRequest();
             }
         }
@@ -163,21 +163,19 @@ public class Crypto implements Command {
 
     final String fixerApi = "5504a61518bd67f319e9a4fa9f3f19fa";
 
-    void CurrencyRequest(){
+    void CurrencyRequest() {
 
         OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .url("http://data.fixer.io/api/latest?access_key=" + fixerApi + "&base=EUR" + "&symbols=USD")
-                .build();
+        Request request = new Request.Builder().url("http://data.fixer.io/api/latest?access_key=" + fixerApi + "&base=EUR" + "&symbols=USD").build();
 
         try (Response response = client.newCall(request).execute()) {
 
-            JSONObject  json = new JSONObject (response.body().string());
+            JSONObject json = new JSONObject(response.body().string());
 
             double exchangeRate = Double.parseDouble(json.getJSONObject("rates").get("USD").toString());
 
-            Currency.usdToEur = (1/exchangeRate);
+            Currency.usdToEur = (1 / exchangeRate);
 
             Currency.timestampLastRequest = new Timestamp(new java.util.Date().getTime());
 

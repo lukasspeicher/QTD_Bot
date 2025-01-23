@@ -6,11 +6,11 @@
 
     <groupId>org.qtd</groupId>
     <artifactId>QTD_Bot</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.8-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+        <maven.compiler.source>19</maven.compiler.source>
+        <maven.compiler.target>19</maven.compiler.target>
     </properties>
 
     <repositories>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20240303</version>
+            <version>20250107</version>
         </dependency>
         <dependency>
             <groupId>io.quickchart</groupId>
@@ -54,12 +54,12 @@
         <dependency>
             <groupId>dev.arbjerg</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>2.2.1</version>
+            <version>2.2.2</version>
         </dependency>
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>v2</artifactId>
-            <version>1.7.2</version>
+            <version>1.11.3</version>
         </dependency>
     </dependencies>
 
@@ -68,7 +68,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -80,16 +80,16 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.4</version>
                 <configuration>
                     <to>
-                        <image>qtdbot:latest</image>
+                        <image>qtdbot:${project.version}</image>
                     </to>
                     <outputPaths>
-                        <tar>${project.build.directory}/${artifactId}-${version}.tar</tar>
-                        <digest>${project.build.directory}/${artifactId}-${version}.digest</digest>
-                        <imageId>${project.build.directory}/${artifactId}-${version}.id</imageId>
-                        <imageJson>${project.build.directory}/${artifactId}-${version}.json</imageJson>
+                        <tar>${project.build.directory}/${project.artifactId}-${project.version}.tar</tar>
+                        <digest>${project.build.directory}/${project.artifactId}-${project.version}.digest</digest>
+                        <imageId>${project.build.directory}/${project.artifactId}-${project.version}.id</imageId>
+                        <imageJson>${project.build.directory}/${project.artifactId}-${project.version}.json</imageJson>
                     </outputPaths>
                     <container>
                         <creationTime>${maven.build.timestamp}</creationTime>

@@ -44,15 +44,15 @@ public class Stocks implements Command {
 
         String symbol = "";
 
-        if(option.contains(" ")){
+        if (option.contains(" ")) {
             symbol = parseQueryToSymbol(option.substring(0, option.indexOf(' ')));
 
-            if(option.contains("graph")){
+            if (option.contains("graph")) {
 
                 String possibleTimeInterval = option.substring(option.indexOf("graph"));
 
-                if(possibleTimeInterval.contains(" ")){
-                    printGraph(event, symbol, option.substring(option.lastIndexOf(' ')+1));
+                if (possibleTimeInterval.contains(" ")) {
+                    printGraph(event, symbol, option.substring(option.lastIndexOf(' ') + 1));
                 } else {
                     printGraph(event, symbol, null);
                 }
@@ -64,14 +64,11 @@ public class Stocks implements Command {
 
         OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .url("https://yfapi.net/v6/finance/quote?region=DE&lang=de&symbols=" + symbol)
-                .header("x-api-key", yApiKey)
-                .build();
+        Request request = new Request.Builder().url("https://yfapi.net/v6/finance/quote?region=DE&lang=de&symbols=" + symbol).header("x-api-key", yApiKey).build();
 
         try (Response response = client.newCall(request).execute()) {
 
-            JSONObject json = new JSONObject (response.body().string());
+            JSONObject json = new JSONObject(response.body().string());
 
             JSONObject result = json.getJSONObject("quoteResponse").getJSONArray("result").getJSONObject(0);
 
@@ -94,17 +91,14 @@ public class Stocks implements Command {
 
     }
 
-    String parseQueryToSymbol (String query) {
+    String parseQueryToSymbol(String query) {
         OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .url("https://yfapi.net/v6/finance/autocomplete?region=DE&lang=de&query=" + query)
-                .header("x-api-key", yApiKey)
-                .build();
+        Request request = new Request.Builder().url("https://yfapi.net/v6/finance/autocomplete?region=DE&lang=de&query=" + query).header("x-api-key", yApiKey).build();
 
         try (Response response = client.newCall(request).execute()) {
 
-            JSONObject json = new JSONObject (response.body().string());
+            JSONObject json = new JSONObject(response.body().string());
 
             JSONObject result = json.getJSONObject("ResultSet").getJSONArray("Result").getJSONObject(0);
 
@@ -120,28 +114,25 @@ public class Stocks implements Command {
 
     void printGraph(MessageCreateEvent event, String symbol, String range) {
 
-        if (range == null || range.equalsIgnoreCase("") ||range.equalsIgnoreCase(" ")){
+        if (range == null || range.equalsIgnoreCase("") || range.equalsIgnoreCase(" ")) {
             range = "1d";
         }
 
         OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-                .url("https://yfapi.net/v8/finance/spark?interval=1h&range=" + range + "&symbols=" + symbol)
-                .header("x-api-key", yApiKey)
-                .build();
+        Request request = new Request.Builder().url("https://yfapi.net/v8/finance/spark?interval=1h&range=" + range + "&symbols=" + symbol).header("x-api-key", yApiKey).build();
 
         ArrayList<SpecificValue> data = new ArrayList<>();
 
         try (Response response = client.newCall(request).execute()) {
 
-            JSONObject  json = new JSONObject (response.body().string()).getJSONObject(symbol);
+            JSONObject json = new JSONObject(response.body().string()).getJSONObject(symbol);
 
             JSONArray timestamps = json.getJSONArray("timestamp");
 
             for (int i = 0; i < timestamps.length(); i++) {
                 SpecificValue value = new SpecificValue();
-                value.setTimestamp(new Timestamp(Long.parseLong(timestamps.get(i).toString())*1000)); // Time is in seconds. Should be milliseconds
+                value.setTimestamp(new Timestamp(Long.parseLong(timestamps.get(i).toString()) * 1000)); // Time is in seconds. Should be milliseconds
 
                 JSONArray close = json.getJSONArray("close");
                 value.setPriceUSD(Double.toString(close.getDouble(i)));

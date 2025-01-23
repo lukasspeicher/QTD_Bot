@@ -7,9 +7,10 @@ public class SpecificValue {
     String priceUSD;
     Timestamp timestamp;
 
-    public SpecificValue () {}
+    public SpecificValue() {
+    }
 
-    public SpecificValue (String priceUSD, Timestamp timestamp) {
+    public SpecificValue(String priceUSD, Timestamp timestamp) {
         this.priceUSD = priceUSD;
         this.timestamp = timestamp;
     }
