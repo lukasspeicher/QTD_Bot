@@ -32,7 +32,7 @@ public class TrackScheduler extends AudioEventAdapter {
     // AudioEventAdapter
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        QTDBot.LOGGER.info("Track ended: " + endReason.toString() + "(" + track.getInfo().title + ")");
+        QTDBot.LOGGER.info("Track ended: " + endReason.toString() + " (" + track.getInfo().title + ")");
         event.getApi().updateActivity(QTDBot.DEFAULT_ACTIVITY);
 
         if (endReason.mayStartNext) {
@@ -66,7 +66,7 @@ public class TrackScheduler extends AudioEventAdapter {
             queue.add(track);
 
             if (!isPlaylist) {
-                QTDBot.LOGGER.info("Added track to queue" + track.getInfo().title);
+                QTDBot.LOGGER.info("Added track to queue " + track.getInfo().title);
                 event.getChannel().sendMessage("Track wurde zur Queue hinzugefügt :white_check_mark: ");
             }
         }
